@@ -15,19 +15,23 @@ import { ICON_FILES, TEMPLATE_FILES, repoNameFromRemote, scaffold } from "../scr
 const APP = fileURLToPath(new URL("../", import.meta.url));
 
 const BLUEPRINT_COFOG = `[{:itonami.blueprint/id "cloud-itonami-cofog-03.2"
-  :itonami.blueprint/name "Household Consumption"}]
+  :itonami.blueprint/name "Household Consumption"
+  :itonami.blueprint/cofog "03.2"}]
 `;
 
 const BLUEPRINT_SCHEME_MISSING = `[{:itonami.blueprint/id "cloud-itonami-7810"
-  :itonami.blueprint/name "Growing of Vegetables"}]
+  :itonami.blueprint/name "Growing of Vegetables"
+  :itonami.blueprint/isic-rev4 "7810"}]
 `;
 
 const BLUEPRINT_SUFFIXED = `[{:itonami.blueprint/id "cloud-itonami-8129-facade"
-  :itonami.blueprint/name "Facade Work"}]
+  :itonami.blueprint/name "Facade Work"
+  :itonami.blueprint/isic-rev5 "8129"}]
 `;
 
 const BLUEPRINT_ISCO = `[{:itonami.blueprint/id "cloud-itonami-isco-2423"
-  :itonami.blueprint/name "Community Careers Practice"}]
+  :itonami.blueprint/name "Community Careers Practice"
+  :itonami.blueprint/isco-08 "2423"}]
 `;
 
 async function stamped(blueprint) {
@@ -94,7 +98,7 @@ test("scaffold stamps a scheme-missing blueprint from --repo", async (t) => {
   assert.equal(identity.variant, null);
   assert.equal(identity.slug, "isic7810");
   assert.equal(identity.id, "network.itonami.isic7810");
-  assert.equal(identity.classification, "ISIC Rev.4 7810");
+  assert.equal(identity.classification, "ISIC Rev.4 class 7810");
 
   const pkg = JSON.parse(await readFile(join(repo, "app/package.json"), "utf8"));
   assert.equal(pkg.name, "@itonami/isic7810");
@@ -116,7 +120,7 @@ test("scaffold stamps a suffixed blueprint from --repo", async (t) => {
   assert.equal(identity.variant, "facade");
   assert.equal(identity.slug, "isic8129facade");
   assert.equal(identity.id, "network.itonami.isic8129facade");
-  assert.equal(identity.classification, "ISIC Rev.4 8129");
+  assert.equal(identity.classification, "ISIC Rev.5 class 8129");
 
   const pkg = JSON.parse(await readFile(join(repo, "app/package.json"), "utf8"));
   assert.equal(pkg.name, "@itonami/isic8129facade");
@@ -125,7 +129,8 @@ test("scaffold stamps a suffixed blueprint from --repo", async (t) => {
 
 test("scaffold writes a sanitized productName and the verbatim window title", async (t) => {
   const repo = await stamped(`[{:itonami.blueprint/id "cloud-itonami-isco-2423"
-  :itonami.blueprint/name "Research Support: Biology"}]
+  :itonami.blueprint/name "Research Support: Biology"
+  :itonami.blueprint/isco-08 "2423"}]
 `);
   t.after(() => rm(repo, { recursive: true, force: true }));
   const { identity } = await scaffold(repo, { icons: false, repo: "cloud-itonami-isco-2423" });
