@@ -9,7 +9,7 @@ import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promi
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { join, resolve } from "node:path";
-import { CSP } from "./build.mjs";
+import { cspFor, profileOf } from "./build.mjs";
 import { iconSvg } from "./icon.mjs";
 import { deriveIdentity, readBlueprint } from "./identity.mjs";
 
@@ -27,7 +27,13 @@ export const TEMPLATE_FILES = [
   "scripts/icon.mjs",
   "scripts/identity.mjs",
   "scripts/scaffold.mjs",
+  "scripts/trusted-page-v1-existing.txt",
   "src/app.js",
+  "src/guest.html",
+  "src/guest.js",
+  "src/host.css",
+  "src/host.html",
+  "src/host.js",
   "src/index.html",
   "src/style.css",
   "src/view.js",
@@ -41,12 +47,15 @@ export const TEMPLATE_FILES = [
   "test/build.test.mjs",
   "test/console.test.mjs",
   "test/identity.test.mjs",
+  "test/profile.test.mjs",
   "test/release-source.test.mjs",
   "test/scaffold.test.mjs",
   "test/view.test.mjs",
   "vendor/PINS.json",
   "vendor/kotoba-client-consent.css",
   "vendor/kotoba-client-runtime.js",
+  "vendor/restricted-wasm-v1/kotoba-client-consent.css",
+  "vendor/restricted-wasm-v1/kotoba-client-runtime.js",
 ];
 
 /** Desktop icon files taken from the `tauri icon` output directory. */
@@ -116,19 +125,28 @@ export async function scaffold(repoRoot, { icons = true, repo: repoName = null }
   await mkdir(join(app, "icon"), { recursive: true });
   await mkdir(join(app, "src-tauri"), { recursive: true });
 
+  // A fresh stamp starts at 0.1.0 with restricted-wasm-v1 (KOTOBA-159). A
+  // re-stamp keeps the version and the profile: an existing app without
+  // itonami.runtime predates the field and stays on trusted-page-v1 until it
+  // migrates (build.mjs accepts that only for the listed existing apps).
   let version = "0.1.0";
+  let runtime = "restricted-wasm-v1";
+  let prev = null;
   try {
-    const prev = JSON.parse(await readFile(join(app, "package.json"), "utf8"));
-    if (typeof prev.version === "string" && prev.version) version = prev.version;
+    prev = JSON.parse(await readFile(join(app, "package.json"), "utf8"));
   } catch {
-    // A fresh stamp starts at 0.1.0.
+    prev = null;
+  }
+  if (prev !== null) {
+    if (typeof prev.version === "string" && prev.version) version = prev.version;
+    runtime = profileOf(prev);
   }
   const pkg = {
     name: `@itonami/${identity.slug}`,
     version,
     private: true,
     type: "module",
-    itonami: { id: identity.id, title: identity.title, source: identity.source },
+    itonami: { id: identity.id, title: identity.title, source: identity.source, runtime },
     scripts: {
       build: "node scripts/build.mjs",
       test: "npm run build && node --test test/*.test.mjs",
@@ -149,7 +167,7 @@ export async function scaffold(repoRoot, { icons = true, repo: repoName = null }
     app: {
       withGlobalTauri: true,
       windows: [{ label: "main", title: identity.title, width: 1100, height: 780, minWidth: 360, minHeight: 480 }],
-      security: { csp: CSP },
+      security: { csp: cspFor(runtime, app) },
     },
     bundle: { active: false, icon: CONF_ICONS },
   };
