@@ -1,4 +1,6 @@
 # cloud-itonami-isco-2423
+Occupation reference: ISCO-08 (International Labour Organization, 2012), code 2423. This app is not produced, reviewed or endorsed by the ILO.
+職業の参照: ISCO-08（国際労働機関 ILO、2012 年）のコード 2423。日本語の名称は当方の訳です。この app は ILO が作成・確認・推奨したものではありません。
 
 **Community Careers Practice** — the ISCO-08 2423 (Personnel and
 Careers Professionals) actor, an ISCO **Wave 0** occupation per
@@ -32,8 +34,3 @@ to an employer), low confidence (< 0.6).
 
 AGPL-3.0-or-later, forkable by any qualified operator. Part of the
 [cloud-itonami](https://itonami.cloud) open business fleet.
-
-## Attribution / 出典
-
-- 職業分類: ISCO-08（国際労働機関 ILO）のコード 2423 を参照。この app は ILO が作成・確認・推奨したものではありません。
-- Occupation reference: ISCO-08 (International Labour Organization), code 2423. This app is not produced, reviewed or endorsed by the ILO.
