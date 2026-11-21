@@ -1,7 +1,8 @@
-// Stamp this template into one classification-series repository:
-// read its blueprint.edn and write every identity-bearing file under its
-// app/ directory. Template files below travel byte-identical; only the
-// identity files name the repository's own classification.
+// Stamp this template into one classification-series repository: take the
+// repository's name from --repo (else its git remote origin), check its
+// blueprint.edn against that name, and write every identity-bearing file
+// under its app/ directory. Template files below travel byte-identical;
+// only the identity files name the repository's own classification.
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
@@ -70,10 +71,35 @@ jobs:
         working-directory: app
 `;
 
-export async function scaffold(repoRoot, { icons = true } = {}) {
+/**
+ * The series repository name for a stamp: the --repo value when given,
+ * else the last path segment of the git remote origin URL (with a `.git`
+ * suffix removed). The directory name is never used: worktrees are named
+ * after tasks, not repositories. Fails when neither gives a name.
+ */
+export function repoNameFromRemote(repoRoot) {
+  let url;
+  try {
+    url = execFileSync("git", ["-C", repoRoot, "remote", "get-url", "origin"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  } catch {
+    throw new Error(
+      `cannot determine the repository name for ${repoRoot}: pass --repo <name> or set a git remote origin`,
+    );
+  }
+  const segment = url.trim().replace(/\/+$/, "").split(/[/:]/).pop() ?? "";
+  const name = segment.endsWith(".git") ? segment.slice(0, -".git".length) : segment;
+  if (!name) throw new Error(`git remote origin for ${repoRoot} gives no repository name: pass --repo <name>`);
+  return name;
+}
+
+export async function scaffold(repoRoot, { icons = true, repo: repoName = null } = {}) {
   const repo = resolve(repoRoot);
+  const name = repoName ?? repoNameFromRemote(repo);
   const blueprintText = await readFile(join(repo, "blueprint.edn"), "utf8");
-  const identity = deriveIdentity(readBlueprint(blueprintText));
+  const identity = deriveIdentity(name, readBlueprint(blueprintText));
   const app = join(repo, "app");
   const selfRun = resolve(app) === resolve(HERE);
 
@@ -113,7 +139,7 @@ export async function scaffold(repoRoot, { icons = true } = {}) {
 
   const conf = {
     $schema: "https://schema.tauri.app/config/3",
-    productName: identity.title,
+    productName: identity.productName,
     version,
     identifier: identity.id,
     build: { frontendDist: "../dist" },
@@ -156,11 +182,23 @@ export async function scaffold(repoRoot, { icons = true } = {}) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
-  const root = args.find((a) => !a.startsWith("--"));
+  let repo = null;
+  const rest = [];
+  for (let i = 0; i < args.length; i++) {
+    if (args[i] === "--repo") {
+      i += 1;
+      repo = args[i] ?? null;
+    } else if (args[i].startsWith("--repo=")) {
+      repo = args[i].slice("--repo=".length);
+    } else {
+      rest.push(args[i]);
+    }
+  }
+  const root = rest.find((a) => !a.startsWith("--"));
   if (!root) {
-    console.error("usage: node scripts/scaffold.mjs <repo-root> [--no-icons]");
+    console.error("usage: node scripts/scaffold.mjs <repo-root> [--repo <name>] [--no-icons]");
     process.exit(1);
   }
-  const { identity, app } = await scaffold(root, { icons: !args.includes("--no-icons") });
+  const { identity, app } = await scaffold(root, { icons: !rest.includes("--no-icons"), repo });
   console.log(`${identity.title} (${identity.id}) scaffolded into ${app}`);
 }
