@@ -6,7 +6,8 @@
   "itonami": {
     "id": "network.itonami.isco2423",
     "title": "Community Careers Practice",
-    "source": "cloud-itonami-isco-2423"
+    "source": "cloud-itonami-isco-2423",
+    "runtime": "trusted-page-v1"
   },
   "scripts": {
     "build": "node scripts/build.mjs",

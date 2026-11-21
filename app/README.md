@@ -28,8 +28,33 @@ sources:
   repository's own code, never from a per-repository literal. No ILO logo
   or ILO imagery.
 
-The selected tab is remembered in localStorage; the app still renders when
-storage throws.
+With trusted-page-v1 the selected tab is remembered in localStorage (key
+`itonami.series.<slug>.v1`, the tab id only); the app still renders when
+storage throws. With restricted-wasm-v1 the tab lives in memory and resets
+on each launch, because the sandboxed guest has no localStorage.
+
+## Runtime profile (KOTOBA-159)
+
+`itonami.runtime` in `package.json` names the client runtime profile.
+
+- `restricted-wasm-v1`, for every new repository (`scripts/scaffold.mjs` writes
+  it on a fresh stamp). `index.html` is a trusted host page
+  (`src/host.html`, `src/host.js`) with the canonical runtime from
+  `vendor/restricted-wasm-v1/`. The host verifies the guest document
+  against the SHA-256 and source commit pinned at build time, then mounts it
+  with `mountRestrictedClientApp` in an opaque-origin sandbox. The guest
+  is one self-contained document (`src/guest.html`, plus `src/view.js` and
+  `src/guest.js` inlined as one script). The page policy admits exactly that
+  script, the runtime's preamble and the guest style, by hash. The
+  descriptor's `local-state` adapter is `memory`. The build needs the source
+  commit: build from a git checkout, or set `ITONAMI_SOURCE_COMMIT`.
+- `trusted-page-v1`, only for the existing series apps listed in
+  `scripts/trusted-page-v1-existing.txt`, and only through 2027-03-31 (UTC).
+  A `package.json` without `itonami.runtime` predates the field and is read
+  as trusted-page-v1; a re-stamp keeps the profile it finds. These apps keep
+  the runtime in `vendor/` at its earlier pin. The build refuses
+  trusted-page-v1 for an app that is not listed, and for every app from
+  2027-04-01.
 
 ## Where its data comes from
 
@@ -52,7 +77,8 @@ blueprint id does not match the repository name; re-run
 
 No external operation of any kind. The shipped descriptor declares no
 operations, and the page only loads its own files (`script-src 'self'`,
-`style-src 'self'`). An operation added later must go through the vendored
+`style-src 'self'`, plus the guest's hashed inline script and style under
+restricted-wasm-v1). An operation added later must go through the vendored
 canonical broker with per-operation consent. There is no product-local
 consent logic and no remote fallback.
 

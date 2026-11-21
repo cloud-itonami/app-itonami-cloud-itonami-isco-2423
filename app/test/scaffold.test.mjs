@@ -9,7 +9,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
-import { CSP } from "../scripts/build.mjs";
+import { cspFor } from "../scripts/build.mjs";
 import { ICON_FILES, TEMPLATE_FILES, repoNameFromRemote, scaffold } from "../scripts/scaffold.mjs";
 
 const APP = fileURLToPath(new URL("../", import.meta.url));
@@ -49,6 +49,7 @@ test("scaffold writes identity files for a dotted cofog code", async (t) => {
     id: "network.itonami.cofog032",
     title: "Household Consumption",
     source: "cloud-itonami-cofog-03.2",
+    runtime: "restricted-wasm-v1",
   });
   assert.deepEqual(
     Object.keys(pkg.scripts).sort(),
@@ -63,7 +64,7 @@ test("scaffold writes identity files for a dotted cofog code", async (t) => {
   assert.equal(conf.app.windows[0].title, "Household Consumption");
   assert.equal(conf.build.frontendDist, "../dist");
   assert.equal(conf.app.withGlobalTauri, true);
-  assert.equal(conf.app.security.csp, CSP);
+  assert.equal(conf.app.security.csp, cspFor("restricted-wasm-v1", join(repo, "app")));
   assert.equal(conf.bundle.active, false);
   assert.equal(conf.bundle.icon.length, 5);
 
@@ -101,6 +102,7 @@ test("scaffold stamps a scheme-missing blueprint from --repo", async (t) => {
     id: "network.itonami.isic7810",
     title: "Growing of Vegetables",
     source: "cloud-itonami-isic-7810",
+    runtime: "restricted-wasm-v1",
   });
 });
 
