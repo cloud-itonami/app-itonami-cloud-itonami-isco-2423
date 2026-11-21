@@ -99,6 +99,12 @@ consent logic and no remote fallback.
   network request, and the Store lists every permission an APK asks for. After
   the build, `aapt2 dump permissions` must show no INTERNET (aapt2 from the
   newest Android SDK build-tools is required).
+- `src-tauri/Cargo.lock` is kept in the order cargo writes it
+  (`test/cargo-lock.test.mjs`), so a build leaves the checkout clean. After a
+  dependency change, let cargo rewrite it (for example
+  `cargo update --workspace --offline` in `src-tauri/`, which changes no locked
+  version) and commit the result. `cargo metadata --locked` does not detect an
+  order-only difference.
 - `tauri android dev` loads the page from a development server and needs
   INTERNET. It does not run `android-apk.sh`, so its manifest keeps the
   permission; only the APK built by `npm run build:android` drops it.
