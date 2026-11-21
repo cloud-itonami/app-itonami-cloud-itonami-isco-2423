@@ -94,7 +94,14 @@ consent logic and no remote fallback.
   `tauri android init` (`src-tauri/gen/android/` is not in git) and writes the
   committed `android/MainActivity.kt` (edge-to-edge insets and system-bar
   colours from the page's `--bg`) into it, with the package taken from
-  `tauri.conf.json`'s identifier.
+  `tauri.conf.json`'s identifier. `scripts/android-manifest.mjs` then removes
+  `android.permission.INTERNET` (`tools:node="remove"`): the app makes no
+  network request, and the Store lists every permission an APK asks for. After
+  the build, `aapt2 dump permissions` must show no INTERNET (aapt2 from the
+  newest Android SDK build-tools is required).
+- `tauri android dev` loads the page from a development server and needs
+  INTERNET. It does not run `android-apk.sh`, so its manifest keeps the
+  permission; only the APK built by `npm run build:android` drops it.
 - `node scripts/scaffold.mjs <repo-root> [--repo <name>] [--no-icons]`:
   stamp this template into a series repository and rewrite its identity
   files from the repository name and its `blueprint.edn`. The name comes
