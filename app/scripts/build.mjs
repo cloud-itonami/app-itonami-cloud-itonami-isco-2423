@@ -41,7 +41,10 @@ export async function build(appRoot = fileURLToPath(new URL("../", import.meta.u
   const blueprintText = await source("blueprint.edn");
   if (blueprintText === null) throw new Error("blueprint.edn not found next to app/");
   const blueprint = readBlueprint(blueprintText);
-  const identity = deriveIdentity(blueprint);
+  if (typeof meta.itonami?.source !== "string" || !meta.itonami.source) {
+    throw new Error("package.json has no itonami.source; re-run scripts/scaffold.mjs");
+  }
+  const identity = deriveIdentity(meta.itonami.source, blueprint);
 
   // The stamped files must agree with the blueprint they were stamped from.
   const conf = JSON.parse(await readFile(resolve(appRoot, "src-tauri/tauri.conf.json"), "utf8"));
@@ -49,7 +52,7 @@ export async function build(appRoot = fileURLToPath(new URL("../", import.meta.u
   expect("package.json itonami.id", meta.itonami?.id, identity.id);
   expect("package.json itonami.source", meta.itonami?.source, identity.source);
   expect("tauri.conf.json identifier", conf.identifier, identity.id);
-  expect("tauri.conf.json productName", conf.productName, identity.title);
+  expect("tauri.conf.json productName", conf.productName, identity.productName);
   expect("tauri.conf.json window title", conf.app?.windows?.[0]?.title, identity.title);
   expect("tauri.conf.json version", conf.version, meta.version);
   expect("tauri.conf.json csp", conf.app?.security?.csp, CSP);
