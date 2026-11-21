@@ -19,7 +19,9 @@ const hash = (text) => `'sha256-${createHash("sha256").update(text, "utf8").dige
 async function stamp(t, source, name) {
   const repo = await mkdtemp(join(tmpdir(), "itonami-profile-"));
   t.after(() => rm(repo, { recursive: true, force: true }));
-  await writeFile(join(repo, "blueprint.edn"), `[{:itonami.blueprint/id "${source}"\n  :itonami.blueprint/name "${name}"}]\n`);
+  const [, scheme, code] = /^cloud-itonami-([a-z]+)-([^-]+)/.exec(source);
+  const key = { isco: "isco-08", isic: "isic-rev5", cofog: "cofog", jsic: "jsic-code", unspsc: "unspsc-segment" }[scheme];
+  await writeFile(join(repo, "blueprint.edn"), `[{:itonami.blueprint/id "${source}"\n  :itonami.blueprint/name "${name}"\n  :itonami.blueprint/${key} "${code}"}]\n`);
   await scaffold(repo, { icons: false, repo: source });
   return join(repo, "app");
 }
