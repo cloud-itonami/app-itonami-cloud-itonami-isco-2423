@@ -37,7 +37,12 @@ storage throws.
 in `package.json`, plus `blueprint.edn`, `physics.edn` (when present)
 and `docs/samples/operator-console.html` (when present) next to `app/`,
 pins each source by SHA-256 digest in `dist/release.json`, and writes the
-page's `dist/data.js`. The app carries no second, hand-written copy of the
+page's `dist/data.js`. `release.json` also says which commit was built:
+`source_commit` is the 40-hex `git rev-parse HEAD` of the repository root
+and `dirty` is true when `git status --porcelain` lists a tracked change or
+an untracked file that is not ignored. Outside a git checkout the build
+takes `ITONAMI_SOURCE_COMMIT` (40 hex) and `ITONAMI_SOURCE_DIRTY` (`true` or
+`false`) when they are set, and writes `null` otherwise. The app carries no second, hand-written copy of the
 data. The build refuses to run when `package.json` or
 `src-tauri/tauri.conf.json` disagree with the derived identity, or when the
 blueprint id does not match the repository name; re-run
@@ -58,7 +63,12 @@ consent logic and no remote fallback.
 - `npm test`: builds, then runs `node --test test/*.test.mjs`.
 - `npm run build:desktop`: static build, then a Tauri desktop build.
 - `npm run build:android`: via `sh scripts/android-apk.sh` (needs the
-  Android SDK + NDK 27, JDK 21, and the `aarch64-linux-android` Rust target).
+  Android SDK + NDK 27, JDK 21, cargo/rustc on PATH, and the
+  `aarch64-linux-android` Rust target). Each run starts from a fresh
+  `tauri android init` (`src-tauri/gen/android/` is not in git) and writes the
+  committed `android/MainActivity.kt` (edge-to-edge insets and system-bar
+  colours from the page's `--bg`) into it, with the package taken from
+  `tauri.conf.json`'s identifier.
 - `node scripts/scaffold.mjs <repo-root> [--repo <name>] [--no-icons]`:
   stamp this template into a series repository and rewrite its identity
   files from the repository name and its `blueprint.edn`. The name comes
