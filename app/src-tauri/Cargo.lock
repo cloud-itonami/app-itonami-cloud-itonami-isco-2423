@@ -1514,7 +1514,7 @@ dependencies = [
 [[package]]
 name = "itonami-series-build"
 version = "0.1.0"
-source = "git+https://github.com/cloud-itonami/itonami-lib?rev=378a49fddd46281d07481a0d4d08eb9b5b0fd875#378a49fddd46281d07481a0d4d08eb9b5b0fd875"
+source = "git+https://github.com/cloud-itonami/itonami-lib?rev=7240ca24dd2503a0c7f02d1f05cdcd93e4edd067#7240ca24dd2503a0c7f02d1f05cdcd93e4edd067"
 dependencies = [
  "tauri-build",
 ]
@@ -1522,7 +1522,7 @@ dependencies = [
 [[package]]
 name = "itonami-series-host"
 version = "0.1.0"
-source = "git+https://github.com/cloud-itonami/itonami-lib?rev=378a49fddd46281d07481a0d4d08eb9b5b0fd875#378a49fddd46281d07481a0d4d08eb9b5b0fd875"
+source = "git+https://github.com/cloud-itonami/itonami-lib?rev=7240ca24dd2503a0c7f02d1f05cdcd93e4edd067#7240ca24dd2503a0c7f02d1f05cdcd93e4edd067"
 dependencies = [
  "serde_json",
  "tauri",

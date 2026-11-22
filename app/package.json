@@ -17,7 +17,7 @@
     "build:desktop": "itonami-app build && tauri build --no-bundle"
   },
   "devDependencies": {
-    "@itonami/series-app": "github:cloud-itonami/itonami-lib#378a49fddd46281d07481a0d4d08eb9b5b0fd875",
+    "@itonami/series-app": "github:cloud-itonami/itonami-lib#7240ca24dd2503a0c7f02d1f05cdcd93e4edd067",
     "@tauri-apps/cli": "3.0.0-alpha.6"
   }
 }

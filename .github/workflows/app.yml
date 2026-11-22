@@ -7,4 +7,4 @@ on:
     paths: ["app/**", "blueprint.edn", "physics.edn", "docs/samples/**", ".github/workflows/app.yml"]
 jobs:
   test:
-    uses: cloud-itonami/itonami-lib/.github/workflows/app.yml@378a49fddd46281d07481a0d4d08eb9b5b0fd875
+    uses: cloud-itonami/itonami-lib/.github/workflows/app.yml@7240ca24dd2503a0c7f02d1f05cdcd93e4edd067
