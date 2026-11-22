@@ -1,18 +1,10 @@
 name: app
 on:
   pull_request:
-    paths: ["app/**", "blueprint.edn", "physics.edn", "docs/samples/**"]
+    paths: ["app/**", "blueprint.edn", "physics.edn", "docs/samples/**", ".github/workflows/app.yml"]
   push:
     branches: [main]
-    paths: ["app/**", "blueprint.edn", "physics.edn", "docs/samples/**"]
+    paths: ["app/**", "blueprint.edn", "physics.edn", "docs/samples/**", ".github/workflows/app.yml"]
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22 }
-      - run: npm ci
-        working-directory: app
-      - run: npm test
-        working-directory: app
+    uses: cloud-itonami/itonami-lib/.github/workflows/app.yml@378a49fddd46281d07481a0d4d08eb9b5b0fd875

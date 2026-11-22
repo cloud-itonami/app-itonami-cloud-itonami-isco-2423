@@ -7,16 +7,13 @@ rust-version = "1.95"
 name = "itonami_series_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 [build-dependencies]
-tauri-build = { version = "=3.0.0-alpha.4", features = [] }
+itonami-series-build = { git = "https://github.com/cloud-itonami/itonami-lib", rev = "378a49fddd46281d07481a0d4d08eb9b5b0fd875" }
 [dependencies]
+# tauri must equal the pin in itonami-series-host: generate_context!() expands here.
 tauri = { version = "=3.0.0-alpha.6", features = [] }
-tauri-runtime-wry = "=3.0.0-alpha.6"
-serde_json = "1"
+itonami-series-host = { git = "https://github.com/cloud-itonami/itonami-lib", rev = "378a49fddd46281d07481a0d4d08eb9b5b0fd875" }
 [features]
 custom-protocol = ["tauri/custom-protocol"]
-
-# Android APKs are debug builds: without debug info and with symbols stripped
-# the native library stays small (AGP's own strip step does not run here).
 [profile.dev]
 debug = 0
 strip = "symbols"

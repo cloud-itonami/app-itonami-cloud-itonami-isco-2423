@@ -1506,9 +1506,26 @@ checksum = "3bd1574e617a9a6c1f8f8181bd7e841e1f20e4277607ef28945765188d6284d4"
 name = "itonami-series-app"
 version = "0.1.0"
 dependencies = [
+ "itonami-series-build",
+ "itonami-series-host",
+ "tauri",
+]
+
+[[package]]
+name = "itonami-series-build"
+version = "0.1.0"
+source = "git+https://github.com/cloud-itonami/itonami-lib?rev=378a49fddd46281d07481a0d4d08eb9b5b0fd875#378a49fddd46281d07481a0d4d08eb9b5b0fd875"
+dependencies = [
+ "tauri-build",
+]
+
+[[package]]
+name = "itonami-series-host"
+version = "0.1.0"
+source = "git+https://github.com/cloud-itonami/itonami-lib?rev=378a49fddd46281d07481a0d4d08eb9b5b0fd875#378a49fddd46281d07481a0d4d08eb9b5b0fd875"
+dependencies = [
  "serde_json",
  "tauri",
- "tauri-build",
  "tauri-runtime-wry",
 ]
 

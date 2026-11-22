@@ -10,13 +10,14 @@
     "runtime": "trusted-page-v1"
   },
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "test": "npm run build && node --test test/*.test.mjs",
+    "build": "itonami-app build",
+    "test": "itonami-app test",
     "tauri": "tauri",
-    "build:desktop": "npm run build && tauri build --no-bundle",
-    "build:android": "sh scripts/android-apk.sh"
+    "android": "itonami-app android",
+    "build:desktop": "itonami-app build && tauri build --no-bundle"
   },
   "devDependencies": {
+    "@itonami/series-app": "github:cloud-itonami/itonami-lib#378a49fddd46281d07481a0d4d08eb9b5b0fd875",
     "@tauri-apps/cli": "3.0.0-alpha.6"
   }
 }
