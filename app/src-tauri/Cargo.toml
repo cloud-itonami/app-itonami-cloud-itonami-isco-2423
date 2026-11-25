@@ -11,6 +11,7 @@ itonami-series-build = { git = "https://github.com/cloud-itonami/itonami-lib", r
 [dependencies]
 # tauri must equal the pin in itonami-series-host: generate_context!() expands here.
 tauri = { version = "=3.0.0-alpha.6", features = [] }
+tauri-runtime-wry = "=3.0.0-alpha.6"
 itonami-series-host = { git = "https://github.com/cloud-itonami/itonami-lib", rev = "eb5fbdffdd2cb4a1509a893bb167191339547254" }
 [features]
 custom-protocol = ["tauri/custom-protocol"]

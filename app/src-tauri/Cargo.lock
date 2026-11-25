@@ -1509,6 +1509,7 @@ dependencies = [
  "itonami-series-build",
  "itonami-series-host",
  "tauri",
+ "tauri-runtime-wry",
 ]
 
 [[package]]
